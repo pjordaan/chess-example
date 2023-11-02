@@ -1,0 +1,18 @@
+{
+    "name": "developer/packages",
+    "require": {
+        "php": "8.*",
+        "p-chess/chess": "^0.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Developer\\Packages\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pieter Jordaan",
+            "email": "pieter.jordaan@paqt.com"
+        }
+    ]
+}
