@@ -64,6 +64,7 @@ class BestMovePicker
             if ($chess->inDraw()) {
                 unset($this->alreadyCalculated[$hash]);
             }
+            $chess->undo();
         }
         if (!isset($this->alreadyCalculated[$hash]) || (($this->alreadyCalculatedRecursion[$hash] ?? 0) < $maxRecursion)) {
             $moves = $chess->moves();
