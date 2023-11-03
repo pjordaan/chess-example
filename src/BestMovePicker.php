@@ -16,7 +16,7 @@ class BestMovePicker
     public const KNIGHT = 12;
     public const BISHOP = 16;
     public const ROOK = 16;
-    public const QUEEN = 32;
+    public const QUEEN = 64;
 
     private array $alreadyCalculated = [];
 
@@ -85,8 +85,6 @@ class BestMovePicker
             }
 
             assert(!empty($bestResult));
-            // divide best score by the number of possible moves to get an average
-            $bestResult->score /= count($moves);
             $this->alreadyCalculated[$hash] = $bestResult;
         }
         return $this->alreadyCalculated[$hash];
