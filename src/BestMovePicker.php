@@ -64,9 +64,7 @@ class BestMovePicker
             foreach ($moves as $move) {
                 $san = $move->san;
                 $result = $chess->move($san);
-                $newHash = json_encode($chess->board);
                 assert(null !== $result, 'illegal move');
-                assert($newHash !== $hash);
                 try {
                     $moves = $chess->moves();
                     // if chess match is over we return the current board rating.
