@@ -59,6 +59,12 @@ class BestMovePicker
         int $maxRecursion = 2
     ): MoveResult {
         $hash = json_encode($chess->board);
+        if (isset($this->alreadyCalculated[$hash])) {
+            $move = $chess->move($this->alreadyCalculated[$hash]->move);
+            if ($chess->inDraw()) {
+                unset($this->alreadyCalculated[$hash]);
+            }
+        }
         if (!isset($this->alreadyCalculated[$hash]) || (($this->alreadyCalculatedRecursion[$hash] ?? 0) < $maxRecursion)) {
             $moves = $chess->moves();
 
