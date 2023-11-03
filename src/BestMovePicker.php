@@ -60,7 +60,7 @@ class BestMovePicker
     ): MoveResult {
         $hash = json_encode($chess->board);
         if (isset($this->alreadyCalculated[$hash])) {
-            $move = $chess->move($this->alreadyCalculated[$hash]->move);
+            $chess->move($this->alreadyCalculated[$hash]->move);
             if ($chess->inDraw()) {
                 unset($this->alreadyCalculated[$hash]);
             }
