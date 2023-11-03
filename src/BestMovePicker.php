@@ -20,6 +20,8 @@ class BestMovePicker
 
     private array $alreadyCalculated = [];
 
+    private array $alreadyCalculatedRecursion = [];
+
     private function giveScore(Chess $chess): int
     {
         $score = 0;
@@ -57,7 +59,7 @@ class BestMovePicker
         int $maxRecursion = 2
     ): MoveResult {
         $hash = json_encode($chess->board);
-        if (!isset($alreadyCalculated[$hash])) {
+        if (!isset($this->alreadyCalculated[$hash]) || (($this->alreadyCalculatedRecursion[$hash] ?? 0) < $maxRecursion)) {
             $moves = $chess->moves();
 
             $bestResult = null;
@@ -84,6 +86,7 @@ class BestMovePicker
 
             assert(!empty($bestResult));
             $this->alreadyCalculated[$hash] = $bestResult;
+            $this->alreadyCalculatedRecursion[$hash] = $maxRecursion;
         }
         return $this->alreadyCalculated[$hash];
     }
