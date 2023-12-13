@@ -2,6 +2,7 @@
 
 namespace Developer\Packages;
 
+use InvalidArgumentException;
 use PChess\Chess\Chess;
 use PChess\Chess\Piece;
 /**
@@ -49,14 +50,24 @@ class BestMovePicker
         return $score;
     }
 
-    /**
-     * Returns the next best move that is beneficial for black.
-     * It does this by calling this method recursively for every possible next move until someone wins.
-     * It keeps track of already calculated boards to speed this process up.
-     */
     public function decide(
         Chess $chess,
         int $maxRecursion = 2
+    ): MoveResult {
+        $this->alreadyCalculated = [];
+        $this->alreadyCalculatedRecursion = [];
+        return $this->doDecide($chess, $maxRecursion);
+    }
+
+    /**
+     * Returns the next best move that is beneficial for black. Of course if the turn is
+     * white it will try to get the least beneficial move for black.
+     * It does this by calling this method recursively for every possible next move until someone wins.
+     * It keeps track of already calculated boards to speed this process up.
+     */
+    protected function doDecide(
+        Chess $chess,
+        int $maxRecursion
     ): MoveResult {
         $hash = json_encode($chess->board);
         if (isset($this->alreadyCalculated[$hash])) {
@@ -68,6 +79,7 @@ class BestMovePicker
         }
         if (!isset($this->alreadyCalculated[$hash]) || (($this->alreadyCalculatedRecursion[$hash] ?? 0) < $maxRecursion)) {
             $moves = $chess->moves();
+            shuffle($moves);
 
             $bestResult = null;
             foreach ($moves as $move) {
@@ -75,12 +87,17 @@ class BestMovePicker
                 $result = $chess->move($san);
                 assert(null !== $result, 'illegal move');
                 try {
+                    try {
                     $moves = $chess->moves();
+                    } catch (InvalidArgumentException) {
+                        // sometimes the library crashes here :(
+                        return new MoveResult($san, $this->giveScore($chess));
+                    }
                     // if chess match is over we return the current board rating.
                     if (empty($moves) || $maxRecursion <= 0) {
                         return new MoveResult($san, $this->giveScore($chess));
                     }
-                    $result = $this->decide($chess, $maxRecursion - 1);
+                    $result = $this->doDecide($chess, $maxRecursion - 1);
                     $result = new MoveResult($san, $result->score);
 
                     if (!$bestResult || ($chess->turn === Piece::WHITE && $bestResult->score < $result->score) || ($chess->turn === Piece::BLACK && $bestResult->score > $result->score)) {
